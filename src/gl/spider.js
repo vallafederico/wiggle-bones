@@ -63,8 +63,8 @@ export class Spider extends Group {
     this.model.position.x = this.a.x;
 
     this.bones.forEach((b, i) => {
-      b.rotation.x = b.baseCtrlxxx.x - this.spinner.velocity.y;
-      b.rotation.z = b.baseCtrlxxx.z + this.spinner.velocity.x;
+      b.rotation.x = b.baseCtrlxxx.x - this.spinner.velocity.y * 0.8;
+      b.rotation.z = b.baseCtrlxxx.z + this.spinner.velocity.x * 0.4;
     });
   }
 }

@@ -26,7 +26,7 @@ export class Gl {
 
     this.camera = this.vp.camera = new Camera();
 
-    this.camera.position.set(0, 0, 4);
+    this.camera.position.set(0, 0, 3);
     // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
     this.paused = false;
