@@ -4,11 +4,22 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
-canvas {
-  display: block;
+
+body {
+  cursor: grab;
 }
 
-#c {
+body:active {
+  cursor: grabbing;
+}
+
+canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+[data-gl="c"] {
   width: 100vw;
   height: 100vh;
   position: fixed;
