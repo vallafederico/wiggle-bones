@@ -1,28 +1,42 @@
 import { Group, MeshNormalMaterial } from "three";
+import { Spinner } from "./util/spinner";
+import { lerp } from "../util/math";
+
+import Material from "./mat/spider";
 
 export class Spider extends Group {
   bones = [];
+  a = {
+    y: 0,
+    ty: 0,
+    x: 0,
+    tx: 0,
+  };
+
   constructor() {
     super();
 
-    const { model } = window.app.gl.assets.model;
-    // console.log(model);
-    this.traverse(model);
+    this.rotation.x = Math.PI * 0.2;
 
-    this.add(model);
+    this.spinner = new Spinner();
+
+    this.mat = new Material();
+
+    const { model } = window.app.gl.assets.model;
+    this.traverse(model);
+    this.model = model;
+    this.add(this.model);
   }
 
   traverse(model) {
     model.traverse((o) => {
-      //   console.log(i);
       if (o.isMesh) {
-        // console.log(o);
-        o.material = new MeshNormalMaterial();
+        o.material = this.mat;
       } else if (o.isBone) {
-        // console.log(o.rotation);
+        // console.log(o);
 
-        if (o.name.substring(0, 4) !== "ctrl") {
-          //   console.log("bone", o.name);
+        if (o.name.substring(0, 1) === "_") {
+          // console.log("bone", o.name);
 
           o.baseCtrlxxx = {
             x: o.rotation._x,
@@ -30,39 +44,27 @@ export class Spider extends Group {
             z: o.rotation._z,
           };
 
-          //   o.baseQuat = {
-          //     x: o.quaternion.x,
-          //     y: o.quaternion.y,
-          //     z: o.quaternion.z,
-          //   };
-          //   console.log(o.baseQuat);
-
-          //   o.rotation.order = "YZX";
-
           this.bones.push(o);
         }
       }
     });
-
-    // setInterval(() => {
-    //   console.log("curr 0", this.bones[0].baseCtrlxxx.x);
-    // }, 1000);
   }
 
   render(t) {
-    // * ROTATION
-    // this.bones.forEach((b, i) => {
-    //   b.rotation.x = b.baseCtrlxxx.x + window.gui.ctrl.x;
-    //   b.rotation.y = b.baseCtrlxxx.y + window.gui.ctrl.x;
-    //   b.rotation.z = b.baseCtrlxxx.z + window.gui.ctrl.x;
-    // });
-    //
-    //  * QUATERION
-    // this.bones.forEach((b, i) => {
-    //   b.quaternion.x = b.baseQuat.x + window.gui.ctrl.x;
-    // });
+    this.spinner.render();
+
+    this.model.rotation.x = this.spinner.velocity.y * 1;
+    this.model.rotation.y = this.spinner.spin.x * 0.1;
+
+    this.a.y = lerp(this.a.y, -this.spinner.velocity.y * 2, 0.05);
+    this.a.x = lerp(this.a.x, this.spinner.velocity.x, 0.05);
+
+    this.model.position.y = this.a.y;
+    this.model.position.x = this.a.x;
+
+    this.bones.forEach((b, i) => {
+      b.rotation.x = b.baseCtrlxxx.x - this.spinner.velocity.y;
+      b.rotation.z = b.baseCtrlxxx.z + this.spinner.velocity.x;
+    });
   }
 }
-
-// fucking hate quaterions have no clue
-// doing all this because I don't want to rerig the mesh

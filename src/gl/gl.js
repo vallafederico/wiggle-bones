@@ -1,5 +1,5 @@
-import { WebGLRenderer } from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { WebGLRenderer, SRGBColorSpace } from "three";
+// import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import Loader from "./util/loader.js";
 
@@ -7,10 +7,17 @@ import Viewport from "./util/viewport.js";
 import Scene from "./scene.js";
 import Camera from "./_camera.js";
 
+import { Post } from "./post.js";
+
 export class Gl {
   constructor(sel) {
     this.vp = new Viewport();
-    this.renderer = new WebGLRenderer({});
+    this.renderer = new WebGLRenderer({
+      antialias: false,
+      stencil: false,
+      depth: false,
+      outputColorSpace: SRGBColorSpace,
+    });
 
     this.renderer.setPixelRatio(this.vp.dpr);
     this.renderer.setSize(this.vp.w, this.vp.h);
@@ -20,7 +27,7 @@ export class Gl {
     this.camera = this.vp.camera = new Camera();
 
     this.camera.position.set(0, 0, 4);
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
     this.paused = false;
     this.time = 0;
@@ -44,18 +51,30 @@ export class Gl {
 
   create() {
     this.scene = new Scene();
+
+    this.post = new Post({
+      renderer: this.renderer,
+      scene: this.scene,
+      camera: this.camera,
+    });
   }
 
   render() {
     if (this.paused) return;
     this.time += 0.05;
 
-    this.controls?.update();
-
+    // this.controls?.update();
     if (this.scene && this.scene.render) this.scene.render(this.time);
 
     requestAnimationFrame(this.render.bind(this));
-    this.renderer.render(this.scene, this.camera);
+
+    // render post if on
+    if (this.post?.isOn) {
+      this.post.renderPasses(this.time);
+      this.post.render();
+    } else {
+      this.renderer.render(this.scene, this.camera);
+    }
   }
 
   resize() {
@@ -63,6 +82,8 @@ export class Gl {
     this.renderer.setSize(this.vp.w, this.vp.h);
     this.camera.aspect = this.vp.w / this.vp.h;
     this.camera.updateProjectionMatrix();
+
+    this.post?.resize();
 
     if (this.scene) this.scene.resize();
   }
