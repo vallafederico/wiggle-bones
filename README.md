@@ -1,6 +1,3 @@
-## Threejs Starter
+## Wiggle Bones Demo
 
-## Todo
-
-- [ ] skin
-- [ ] post
+[Demo 1 (spider)](wiggle-bones-demo-1.surge.sh)
